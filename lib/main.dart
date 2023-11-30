@@ -2,62 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-class PersonBloc extends Bloc<LoadAction, FetchResult?> {
-  final Map<PersonUrl, Iterable<Person>> _cacheResult = {};
-  PersonBloc() : super(null) {
-    on<LoadPersonsAction>((event, emit) async {
-      final url = event.url;
-      if (_cacheResult.containsKey(url)) {
-        final cachedPerson = _cacheResult[url]!;
-        final result = FetchResult(persons: cachedPerson, isCache: true);
-        emit(result);
-      } else {
-        final persons = await getPersons(url.urlString);
-        _cacheResult[url] = persons;
-        final result = FetchResult(persons: persons, isCache: false);
-        emit(result);
-      }
-    });
-  }
-}
-
-@immutable
-abstract class LoadAction {
-  const LoadAction();
-}
-
-@immutable
-class LoadPersonsAction implements LoadAction {
-  final PersonUrl url;
-
-  const LoadPersonsAction({required this.url}) : super();
-}
-
-@immutable
-class Person {
-  final String name;
-  final int age;
-
-  const Person({required this.name, required this.age});
-
-  Person.fromJson(Map<String, dynamic> json)
-      : name = json["name"],
-        age = json["age"];
-}
-
-@immutable
-class FetchResult {
-  final Iterable<Person> persons;
-  final bool isCache;
-
-  const FetchResult({required this.persons, required this.isCache});
-
-  @override
-  String toString() => 'From cache $isCache => $persons';
-}
-
-enum PersonUrl { persons1, persons2 }
+import 'package:try_bloc/bloc/bloc_actions.dart';
+import 'package:try_bloc/bloc/person.dart';
+import 'package:try_bloc/bloc/persons_bloc.dart';
 
 Future<Iterable<Person>> getPersons(String url) async => HttpClient()
     .getUrl(Uri.parse(url))
@@ -65,20 +12,6 @@ Future<Iterable<Person>> getPersons(String url) async => HttpClient()
     .then((resp) => resp.transform(utf8.decoder).join())
     .then((str) => json.decode(str) as List<dynamic>)
     .then((list) => list.map((val) => Person.fromJson(val)));
-
-extension UrlString on PersonUrl {
-  String get urlString {
-    switch (this) {
-      case PersonUrl.persons1:
-
-        /// start live server
-        /// adb reverse tcp:5500 tcp:5500 common issues when use android emulator
-        return 'http://127.0.0.1:5500/api/persons1.json';
-      case PersonUrl.persons2:
-        return 'http://127.0.0.1:5500/api/persons2.json';
-    }
-  }
-}
 
 extension Subscript<T> on Iterable<T> {
   T? operator [](int index) => length > index ? elementAt(index) : null;
@@ -157,7 +90,10 @@ class _HomePageState extends State<HomePage> {
               TextButton(
                 onPressed: () {
                   context.read<PersonBloc>().add(
-                        const LoadPersonsAction(url: PersonUrl.persons1),
+                        const LoadPersonsAction(
+                          url: persons1Url,
+                          loader: getPersons,
+                        ),
                       );
                 },
                 child: const Text('Load Json #1'),
@@ -165,7 +101,10 @@ class _HomePageState extends State<HomePage> {
               TextButton(
                 onPressed: () {
                   context.read<PersonBloc>().add(
-                        const LoadPersonsAction(url: PersonUrl.persons2),
+                        const LoadPersonsAction(
+                          url: persons2Url,
+                          loader: getPersons,
+                        ),
                       );
                 },
                 child: const Text('Load Json #2'),
