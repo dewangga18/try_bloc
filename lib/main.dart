@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
       ),
       home: BlocProvider(
         create: (_) => AppBloc(
+          acceptanceHandle: const LoginHandle.fooBar(),
           loginApi: LoginApi(),
           notesApiProtocol: NoteApi(),
         ),
@@ -55,7 +56,6 @@ class HomePage extends StatelessWidget {
               context: context,
               text: loadingText,
             );
-            print('object');
           } else {
             LoadingScreen.instance().hide();
           }

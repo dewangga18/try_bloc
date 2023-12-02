@@ -1,5 +1,8 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:try_bloc/models.dart';
+import 'package:collection/collection.dart';
 
 @immutable
 class AppState {
@@ -28,4 +31,31 @@ class AppState {
         'handle': handle,
         'data': noteDatas,
       }.toString();
+
+  @override
+  bool operator ==(covariant AppState other) {
+    final otherIsEqual = isLoading == other.isLoading &&
+        error == other.error &&
+        handle == other.handle;
+
+    if (noteDatas == null && other.noteDatas == null) {
+      return otherIsEqual;
+    } else {
+      return otherIsEqual && (noteDatas?.isEqualTo(other.noteDatas) ?? false);
+    }
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        isLoading,
+        error,
+        handle,
+        noteDatas,
+      );
+}
+
+extension UnorderedEquality on Object {
+  bool isEqualTo(other) {
+    return const DeepCollectionEquality.unordered().equals(this, other);
+  }
 }
