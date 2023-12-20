@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "537807993535",
+    "project_id": "try-bloc",
+    "storage_bucket": "try-bloc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:537807993535:android:0bab4d0c7a662e12aba40a",
+        "android_client_info": {
+          "package_name": "com.example.try_bloc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCx-cQ5swe0u20QCyoCafnqyKsIp7FfqUI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
